@@ -46,10 +46,28 @@ public final class NutritionSearchService {
 
     public List<Food> searchNutrition(NutritionSearchRequest request) {
         return loadFromCsvFile(csvFile).stream()
-            .filter(item -> true)
+            .filter(f -> matchesFilters(request, f))
             .limit(request.limit())
             .sorted(buildComparator(request))
             .toList();
+    }
+
+    private boolean matchesFilters(NutritionSearchRequest request, Food food) {
+        return hasMatchingFatRating(request, food.fatRating())
+                && isGreaterThanMinCalories(request, food.calories())
+                && isLessThanMaxCalories(request, food.calories());
+    }
+
+    private boolean hasMatchingFatRating(NutritionSearchRequest request, Food.FatRating fatRating) {
+        return request.fatRating() == null || request.fatRating().equals(fatRating);
+    }
+
+    private boolean isGreaterThanMinCalories(NutritionSearchRequest request, Integer calories) {
+        return request.minCalories() == null || calories >= request.minCalories();
+    }
+
+    private boolean isLessThanMaxCalories(NutritionSearchRequest request, Integer calories) {
+        return request.maxCalories() == null || calories <= request.maxCalories();
     }
 
     private Comparator<Food> buildComparator(NutritionSearchRequest request) {
