@@ -31,8 +31,8 @@ public final class NutritionSearchService {
     public List<Food> searchNutrition(NutritionSearchRequest request) {
         return foodRepository.findAll().stream()
                 .filter(f -> matchesFilters(request, f))
-            .limit(request.limit())
             .sorted(buildComparator(request))
+            .limit(request.limit())
             .toList();
     }
 
